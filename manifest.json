@@ -1,0 +1,9 @@
+{
+  "name": "門市業績試算",
+  "short_name": "業績試算",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f1fb",
+  "theme_color": "#8f6ad9",
+  "lang": "zh-Hant"
+}

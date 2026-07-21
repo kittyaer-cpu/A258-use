@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>多人員快速業績試算小組件</title>
+  <style>
+    :root{
+      --bg1:#f7f2ff;
+      --bg2:#eaf4ff;
+      --card:rgba(255,255,255,.9);
+      --text:#2f2a3a;
+      --muted:#777083;
+      --accent:#8f6ad9;
+      --accent2:#6aa6d9;
+      --good:#39a86b;
+      --warn:#e4a229;
+      --bad:#d95362;
+      --line:#e7e0ef;
+      --soft:#faf8fd;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;
+      color:var(--text);
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      padding:22px;
+    }
+    .app{
+      width:min(1500px,100%);
+      margin:0 auto;
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.9);
+      border-radius:26px;
+      box-shadow:0 20px 60px rgba(86,67,120,.16);
+      overflow:hidden;
+    }
+    header{
+      padding:24px 28px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+    h1{font-size:25px;margin:0}
+    .sub{margin-top:7px;color:var(--muted);font-size:14px}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      border:0;
+      border-radius:13px;
+      padding:11px 15px;
+      font-size:14px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    .primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .secondary{color:var(--accent);background:#f0e9ff}
+    .danger{color:#b63b49;background:#fdebed}
+    .settings{
+      padding:0 28px 18px;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(150px,1fr));
+      gap:12px;
+    }
+    .field{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    input{
+      width:100%;
+      border:1px solid #ddd4e7;
+      border-radius:11px;
+      padding:10px 11px;
+      font-size:14px;
+      outline:none;
+      background:white;
+    }
+    input:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(143,106,217,.12);
+    }
+    .summary{
+      padding:0 28px 20px;
+      display:grid;
+      grid-template-columns:repeat(4,minmax(180px,1fr));
+      gap:12px;
+    }
+    .sum-card{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:15px;
+    }
+    .sum-card small{display:block;color:var(--muted);font-weight:700;margin-bottom:6px}
+    .sum-card strong{font-size:22px}
+    .table-wrap{
+      margin:0 28px 28px;
+      border:1px solid var(--line);
+      border-radius:20px;
+      overflow:auto;
+      background:white;
+    }
+    table{
+      border-collapse:separate;
+      border-spacing:0;
+      min-width:2100px;
+      width:100%;
+      font-size:13px;
+    }
+    th,td{
+      border-right:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:8px;
+      text-align:center;
+      vertical-align:middle;
+    }
+    th{
+      position:sticky;
+      top:0;
+      z-index:3;
+      background:#f6f1fc;
+      font-weight:900;
+      color:#4a4055;
+    }
+    th:first-child, td:first-child{
+      position:sticky;
+      left:0;
+      z-index:2;
+      background:#fff;
+      min-width:140px;
+    }
+    th:first-child{z-index:5;background:#eee5fa}
+    .metric-head{min-width:160px}
+    .cell-stack{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      min-width:150px;
+    }
+    .cell-stack input{padding:8px 7px;font-size:12px}
+    .labels{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:6px;
+      color:var(--muted);
+      font-size:10px;
+      margin-bottom:4px;
+    }
+    .rate{
+      margin-top:5px;
+      border-radius:999px;
+      padding:5px 8px;
+      font-weight:900;
+      display:inline-block;
+      min-width:68px;
+    }
+    .good{background:#e3f6eb;color:#2f8e59}
+    .warn{background:#fff2d3;color:#b5760f}
+    .bad{background:#fde7ea;color:#bc3f4c}
+    .na{background:#eee;color:#777}
+    .person-name{font-weight:900}
+    .person-actions{display:flex;gap:6px;justify-content:center;margin-top:7px}
+    .tiny{padding:6px 8px;border-radius:9px;font-size:11px}
+    .totals td{background:#fbf9fe;font-weight:800}
+    .totals td:first-child{background:#f2ecfa}
+    .note{
+      padding:0 28px 24px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.7;
+    }
+
+    .main-tabs{display:flex;gap:10px;padding:0 28px 18px;flex-wrap:wrap}
+    .main-tab{background:#f0e9ff;color:var(--accent)}
+    .main-tab.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .page{display:none}.page.active{display:block}
+    .page-title{padding:0 28px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .page-title h2{margin:0;font-size:20px}
+    .week-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.week-tab.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent2))}.weekly-table{min-width:1900px}.weekly-table th:first-child,.weekly-table td:first-child{min-width:150px}.weekly-hint{font-size:12px;color:var(--muted);margin-top:12px}.week-target-line{font-size:10px;color:var(--accent);margin-top:5px;font-weight:800}
+    @media(max-width:900px){
+      .settings,.summary{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:560px){
+      body{padding:10px}
+      .settings,.summary{grid-template-columns:1fr}
+      header,.settings,.summary,.note{padding-left:16px;padding-right:16px}
+      .table-wrap{margin-left:16px;margin-right:16px}
+    }
+  
+    /* 手機版優化 */
+    .mobile-only{display:none}
+    @media(max-width:760px){
+      body{
+        padding:0;
+        background:#f5f1fb;
+      }
+      .app{
+        width:100%;
+        min-height:100vh;
+        border-radius:0;
+        box-shadow:none;
+        border:0;
+      }
+      header{
+        padding:18px 16px 12px;
+        position:sticky;
+        top:0;
+        z-index:20;
+        background:rgba(255,255,255,.96);
+        backdrop-filter:blur(12px);
+        border-bottom:1px solid var(--line);
+      }
+      h1{font-size:20px}
+      .sub{font-size:12px;line-height:1.5}
+      .toolbar{
+        width:100%;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+      .toolbar button{
+        width:100%;
+        padding:12px 10px;
+        font-size:13px;
+      }
+      .settings{
+        padding:14px 16px;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      }
+      .field{
+        padding:10px;
+      }
+      .summary{
+        padding:0 16px 14px;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      }
+      .sum-card{
+        padding:12px;
+        border-radius:15px;
+      }
+      .sum-card strong{font-size:18px}
+      .desktop-table{display:none !important}
+      .mobile-only{display:block}
+      .mobile-section{
+        padding:0 16px 18px;
+      }
+      .mobile-person-card{
+        background:#fff;
+        border:1px solid var(--line);
+        border-radius:20px;
+        margin-bottom:14px;
+        overflow:hidden;
+        box-shadow:0 8px 24px rgba(86,67,120,.08);
+      }
+      .mobile-person-head{
+        padding:14px;
+        background:#f7f2fc;
+        display:flex;
+        gap:10px;
+        align-items:center;
+        justify-content:space-between;
+      }
+      .mobile-person-head input{
+        font-weight:900;
+        font-size:16px;
+        background:#fff;
+      }
+      .mobile-person-actions{
+        display:flex;
+        gap:6px;
+        flex-shrink:0;
+      }
+      .mobile-metric{
+        padding:14px;
+        border-top:1px solid var(--line);
+      }
+      .mobile-metric-title{
+        font-weight:900;
+        margin-bottom:10px;
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        align-items:center;
+      }
+      .mobile-input-grid{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      }
+      .mobile-input-grid input{
+        font-size:16px;
+        padding:12px;
+      }
+      .mobile-rate-row{
+        margin-top:10px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+      }
+      .mobile-store{
+        border:2px solid #d8c7f4;
+      }
+      .mobile-store .mobile-person-head{
+        background:#eee5fa;
+      }
+      .mobile-week-tabs{
+        display:flex;
+        gap:8px;
+        overflow-x:auto;
+        padding-bottom:8px;
+        scrollbar-width:none;
+      }
+      .mobile-week-tabs::-webkit-scrollbar{display:none}
+      .mobile-week-grid{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:12px;
+      }
+      .mobile-week-card{
+        background:#fff;
+        border:1px solid var(--line);
+        border-radius:18px;
+        padding:14px;
+      }
+      .mobile-week-card h3{
+        margin:0 0 12px;
+        font-size:16px;
+      }
+      .mobile-week-item{
+        margin-bottom:12px;
+      }
+      .mobile-week-item:last-child{margin-bottom:0}
+      .mobile-week-item label{
+        font-size:12px;
+        margin-bottom:6px;
+      }
+      .mobile-week-item input{
+        font-size:16px;
+        padding:12px;
+      }
+      .note{
+        padding:0 16px 20px;
+      }
+      .modal{
+        width:100%;
+        height:100%;
+        max-height:none;
+        border-radius:0;
+      }
+      .modal-body{padding:14px}
+      .weekly-table{display:none}
+      .mobile-week-editor{display:block}
+      button{
+        min-height:42px;
+      }
+    }
+
+</style>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#8f6ad9">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>多人員快速業績試算小組件</h1>
+        <div class="sub">每位人員可設定不同目標與實績，系統自動計算達成率、剩餘需求與月底預估。</div>
+      </div>
+      <div class="toolbar">
+        <button class="primary" onclick="addPerson()">＋新增人員</button>
+        <button class="secondary" onclick="showPage('weeklyPage')">每週目標分配</button>
+        <button class="secondary" onclick="exportCSV()">匯出 CSV</button>
+        <button class="secondary" onclick="saveData()">儲存資料</button>
+        <button class="danger" onclick="resetAll()">全部重設</button>
+      </div>
+    </header>
+
+    <nav class="main-tabs">
+      <button id="dashboardTab" class="main-tab active" onclick="showPage('dashboardPage')">業績試算</button>
+      <button id="weeklyTab" class="main-tab" onclick="showPage('weeklyPage')">每週目標分配</button>
+    </nav>
+
+    <section id="dashboardPage" class="page active">
+    <section class="settings">
+      <div class="field">
+        <label>已過天數</label>
+        <input id="elapsedDays" type="number" min="1" value="1" oninput="recalculate()">
+      </div>
+      <div class="field">
+        <label>本月總天數</label>
+        <input id="totalDays" type="number" min="1" value="30" oninput="recalculate()">
+      </div>
+      <div class="field">
+        <label>目前週次</label>
+        <select id="currentWeek" onchange="recalculate()" style="width:100%;border:1px solid #ddd4e7;border-radius:11px;padding:10px 11px;font-size:14px;background:white;">
+          <option value="1">第 1 週</option><option value="2">第 2 週</option><option value="3">第 3 週</option><option value="4">第 4 週</option><option value="5">第 5 週</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>低於此達成率顯示紅色</label>
+        <input id="redThreshold" type="number" min="0" max="100" value="80" oninput="recalculate()">
+      </div>
+      <div class="field">
+        <label>達到此比例顯示綠色</label>
+        <input id="greenThreshold" type="number" min="0" value="100" oninput="recalculate()">
+      </div>
+    </section>
+
+    <section class="summary">
+      <div class="sum-card">
+        <small>總保險實績</small>
+        <strong id="summaryInsurance">0</strong>
+      </div>
+      <div class="sum-card">
+        <small>總門號實績</small>
+        <strong id="summaryLines">0</strong>
+      </div>
+      <div class="sum-card">
+        <small>平均總達成率</small>
+        <strong id="summaryAverage">0.0%</strong>
+      </div>
+    </section>
+
+    <div class="table-wrap desktop-table">
+      <table id="salesTable">
+        <thead>
+          <tr id="headerRow">
+            <th>人員</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+
+    <section class="mobile-only mobile-section" id="mobileMain"></section>
+
+    <div class="note">
+      每個項目欄位左邊填「目標」、右邊填「實績」。達成率低於 80% 顯示紅色，80%～99.9% 顯示黃色，100% 以上顯示綠色。資料會保存在目前瀏覽器中。
+    </div>
+    </section>
+
+    <section id="weeklyPage" class="page">
+      <div class="page-title">
+        <div><h2>每週目標分配</h2><div class="sub">依第 1～4 週，分別設定每位人員的各項目標。</div></div>
+        <div class="toolbar"><button class="secondary" onclick="copyWeekTargets()">複製本週到其他週</button><button class="primary" onclick="saveData()">儲存資料</button></div>
+      </div>
+      <div style="padding:0 28px 28px;">
+        <div class="week-tabs" id="weekTabs"></div>
+        <div class="table-wrap" style="margin:0;"><table class="weekly-table"><thead><tr id="weeklyHeader"><th>人員</th></tr></thead><tbody id="weeklyBody"></tbody></table></div>
+        <div class="weekly-hint">週目標只用於每週追蹤，不會覆蓋原本月目標。新增或刪除人員後，這個分頁會同步更新。</div>
+      </div>
+    </section>
+  </main>
+
+<script>
+const metrics = [
+      { key:"pcInsurance", label:"電腦保險", type:"number" },
+  { key:"phoneInsurance", label:"手機保險", type:"number" },
+  { key:"tabletInsurance", label:"平板保險", type:"number" },
+  { key:"watchInsurance", label:"手錶保險", type:"number" },
+  { key:"airpodsInsurance", label:"AirPods 保險", type:"number" },
+  { key:"totalInsurance", label:"總保險", type:"number", auto:true },
+  { key:"totalLines", label:"總門號", type:"number" },
+  { key:"ganp", label:"GA / NP", type:"number" },
+  { key:"above999", label:"999以上", type:"number" }
+];
+
+
+const weeklyExtraMetrics = [
+  { key:"highTicketSpeaker", label:"高單喇叭顆數", type:"number" },
+  { key:"googleReviews", label:"Google 評論則數", type:"number" },
+  { key:"tradeIn", label:"舊換新目標", type:"number" }
+];
+const weeklyMetrics = [...metrics, ...weeklyExtraMetrics];
+
+let people = [];
+let storeTargets = {};
+
+let activeMonthKey = "";
+
+function getMonthKey(date=new Date()){
+  return date.getFullYear()+"-"+String(date.getMonth()+1).padStart(2,"0");
+}
+
+function getCurrentWeekOfMonth(date=new Date()){
+  const year=date.getFullYear();
+  const month=date.getMonth();
+  const day=date.getDate();
+  const firstDay=new Date(year,month,1);
+  const firstSundayOffset=(7-firstDay.getDay())%7;
+  const firstSaturday=1+firstSundayOffset-1;
+
+  if(day<=firstSaturday || firstSaturday===0) return 1;
+  const daysAfterFirstSaturday=day-firstSaturday;
+  const week=Math.floor((daysAfterFirstSaturday-1)/7)+2;
+  return Math.min(week,4);
+}
+
+function getWeekDateRange(week,date=new Date()){
+  const year=date.getFullYear();
+  const month=date.getMonth();
+  const lastDay=new Date(year,month+1,0).getDate();
+  const firstDay=new Date(year,month,1);
+  const firstSundayOffset=(7-firstDay.getDay())%7;
+  const firstSaturday=Math.max(1,firstSundayOffset);
+
+  let start,end;
+  if(week===1){
+    start=1;
+    end=Math.min(firstSaturday,lastDay);
+  }else if(week===2){
+    start=firstSaturday+1;
+    end=Math.min(start+6,lastDay);
+  }else if(week===3){
+    start=firstSaturday+8;
+    end=Math.min(start+6,lastDay);
+  }else{
+    start=firstSaturday+15;
+    end=lastDay;
+  }
+  start=Math.min(Math.max(1,start),lastDay);
+  return {start,end};
+}
+
+function initAutomaticCalendar(){
+  const now=new Date();
+  activeMonthKey=getMonthKey(now);
+  const week=getCurrentWeekOfMonth(now);
+  const range=getWeekDateRange(week,now);
+  const monthLabel=`${now.getFullYear()}年${now.getMonth()+1}月`;
+  const weekLabel=`第 ${week} 週（${now.getMonth()+1}/${range.start}～${now.getMonth()+1}/${range.end}）`;
+
+  const monthEl=document.getElementById("currentMonthDisplay");
+  const weekEl=document.getElementById("currentWeekDisplay");
+  const hidden=document.getElementById("currentWeek");
+  if(monthEl) monthEl.value=monthLabel;
+  if(weekEl) weekEl.value=weekLabel;
+  if(hidden) hidden.value=String(week);
+
+  document.getElementById("elapsedDays").value=now.getDate();
+  document.getElementById("totalDays").value=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+}
+
+
+function defaultPerson(name="新進人員"){
+  const p = { id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(), name, data:{}, weeklyTargets:{} };
+  metrics.forEach(m => p.data[m.key] = { target:0, actual:0 });
+  for(let w=1;w<=4;w++){p.weeklyTargets[w]={};weeklyMetrics.forEach(m=>p.weeklyTargets[w][m.key]=0);}
+  return p;
+}
+
+function setupHeader(){
+  const row = document.getElementById("headerRow");
+  row.innerHTML = "<th>人員</th>";
+  metrics.forEach(m => {
+    const th = document.createElement("th");
+    th.className = "metric-head";
+    th.textContent = m.label;
+    row.appendChild(th);
+  });
+}
+
+function formatValue(v,type){
+  const n = Number(v)||0;
+  if(type==="money") return "$"+Math.round(n).toLocaleString("zh-TW");
+  return Math.round(n).toLocaleString("zh-TW");
+}
+
+function calcRate(target,actual){
+  target=Number(target)||0;
+  actual=Number(actual)||0;
+  if(target<=0) return null;
+  return actual/target*100;
+}
+
+function rateClass(rate){
+  if(rate===null) return "na";
+  const red=Number(document.getElementById("redThreshold").value)||80;
+  const green=Number(document.getElementById("greenThreshold").value)||100;
+  if(rate>=green) return "good";
+  if(rate>=red) return "warn";
+  return "bad";
+}
+
+function insuranceActual(person){
+  return ["pcInsurance","phoneInsurance","tabletInsurance","watchInsurance","airpodsInsurance"]
+    .reduce((sum,k)=>sum+(Number(person.data[k].actual)||0),0);
+}
+function insuranceTarget(person){
+  return ["pcInsurance","phoneInsurance","tabletInsurance","watchInsurance","airpodsInsurance"]
+    .reduce((sum,k)=>sum+(Number(person.data[k].target)||0),0);
+}
+
+function getStoreActual(key){
+  return people.reduce((sum,p)=>sum+(Number(p.data[key]?.actual)||0),0);
+}
+
+function ensureStoreTargets(){
+  metrics.forEach(m=>{
+    if(storeTargets[m.key]===undefined) storeTargets[m.key]=0;
+  });
+  // 全店總保險目標可獨立設定，不強制等於各保險類別目標加總。
+}
+
+function renderStoreRow(body){
+  ensureStoreTargets();
+  const tr=document.createElement("tr");
+  tr.className="totals";
+
+  const nameTd=document.createElement("td");
+  nameTd.innerHTML=`<div class="person-name">🏪 全店</div><div style="font-size:11px;color:var(--muted);margin-top:5px;">實績自動加總</div>`;
+  tr.appendChild(nameTd);
+
+  metrics.forEach(metric=>{
+    const target=Number(storeTargets[metric.key])||0;
+    const actual=metric.key==="totalInsurance"
+      ? ["pcInsurance","phoneInsurance","tabletInsurance","watchInsurance","airpodsInsurance"].reduce((s,k)=>s+getStoreActual(k),0)
+      : getStoreActual(metric.key);
+    const rate=calcRate(target,actual);
+    const td=document.createElement("td");
+
+    if(metric.auto && metric.key!=="totalInsurance"){
+      td.innerHTML=`
+        <div class="labels"><span>目標</span><span>實績</span></div>
+        <div class="cell-stack">
+          <input value="${target}" disabled>
+          <input value="${actual}" disabled>
+        </div>
+        <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>`;
+    }else{
+      td.innerHTML=`
+        <div class="labels"><span>目標</span><span>實績</span></div>
+        <div class="cell-stack">
+          <input type="number" min="0" step="1" value="${target}"
+            oninput="updateStoreTarget('${metric.key}',this.value)">
+          <input value="${actual}" disabled>
+        </div>
+        <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>`;
+    }
+    tr.appendChild(td);
+  });
+
+  body.appendChild(tr);
+}
+
+function render(){
+  setupHeader();
+  const body=document.getElementById("tableBody");
+  body.innerHTML="";
+
+  renderStoreRow(body);
+
+  people.forEach((person,index)=>{
+    person.data.totalInsurance.target = insuranceTarget(person);
+    person.data.totalInsurance.actual = insuranceActual(person);
+
+    const tr=document.createElement("tr");
+
+    const nameTd=document.createElement("td");
+    nameTd.innerHTML=`
+      <input class="person-name" value="${escapeHtml(person.name)}"
+        oninput="updateName(${index},this.value)">
+      <div class="person-actions">
+        <button class="tiny secondary" onclick="duplicatePerson(${index})">複製</button>
+        <button class="tiny danger" onclick="removePerson(${index})">刪除</button>
+      </div>`;
+    tr.appendChild(nameTd);
+
+    metrics.forEach(metric=>{
+      const d=person.data[metric.key];
+      const rate=calcRate(d.target,d.actual);
+      const td=document.createElement("td");
+
+      if(metric.auto){
+        td.innerHTML=`
+          <div class="labels"><span>目標</span><span>實績</span></div>
+          <div class="cell-stack">
+            <input value="${d.target}" disabled>
+            <input value="${d.actual}" disabled>
+          </div>
+          <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>
+          <div class="week-target-line">本週目標：${getWeeklyTarget(person,metric.key)}</div>`;
+      }else{
+        td.innerHTML=`
+          <div class="labels"><span>目標</span><span>實績</span></div>
+          <div class="cell-stack">
+            <input type="number" min="0" step="1" value="${d.target}"
+              oninput="updateMetric(${index},'${metric.key}','target',this.value)">
+            <input type="number" min="0" step="1" value="${d.actual}"
+              oninput="updateMetric(${index},'${metric.key}','actual',this.value)">
+          </div>
+          <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>
+          <div class="week-target-line">本週目標：${getWeeklyTarget(person,metric.key)}</div>`;
+      }
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+
+  renderTotals();
+  updateSummary();
+  renderMobileMain();
+  saveData(false);
+}
+
+function renderTotals(){
+  const foot=document.getElementById("tableFoot");
+  const tr=document.createElement("tr");
+  tr.className="totals";
+  tr.innerHTML="<td>人員目標合計</td>";
+
+  metrics.forEach(metric=>{
+    let target=0,actual=0;
+    people.forEach(p=>{
+      target+=Number(p.data[metric.key].target)||0;
+      actual+=Number(p.data[metric.key].actual)||0;
+    });
+    const rate=calcRate(target,actual);
+    const td=document.createElement("td");
+    td.innerHTML=`
+      <div>${formatValue(target,metric.type)} / ${formatValue(actual,metric.type)}</div>
+      <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>`;
+    tr.appendChild(td);
+  });
+
+  foot.innerHTML="";
+  foot.appendChild(tr);
+}
+
+function updateSummary(){
+  let insurance=0,lines=0,totalRates=0,count=0;
+  people.forEach(p=>{
+    insurance+=Number(p.data.totalInsurance.actual)||0;
+    lines+=Number(p.data.totalLines.actual)||0;
+    metrics.forEach(m=>{
+      const r=calcRate(p.data[m.key].target,p.data[m.key].actual);
+      if(r!==null){ totalRates+=r; count++; }
+    });
+  });
+  document.getElementById("summaryInsurance").textContent=formatValue(insurance,"number");
+  document.getElementById("summaryLines").textContent=formatValue(lines,"number");
+  document.getElementById("summaryAverage").textContent=(count?totalRates/count:0).toFixed(1)+"%";
+}
+
+
+let editingWeek = 1;
+function ensureWeeklyTargets(person){
+  if(!person.weeklyTargets) person.weeklyTargets={};
+  const monthKey=activeMonthKey||getMonthKey();
+
+  // Upgrade old non-monthly data into the current month only.
+  if(person.weeklyTargets[1] && !person.weeklyTargets[monthKey]){
+    const oldData={};
+    for(let w=1;w<=4;w++) oldData[w]=person.weeklyTargets[w]||{};
+    person.weeklyTargets={};
+    person.weeklyTargets[monthKey]=oldData;
+  }
+
+  if(!person.weeklyTargets[monthKey]) person.weeklyTargets[monthKey]={};
+  for(let w=1;w<=4;w++){
+    if(!person.weeklyTargets[monthKey][w]) person.weeklyTargets[monthKey][w]={};
+    weeklyMetrics.forEach(m=>{
+      if(person.weeklyTargets[monthKey][w][m.key]===undefined){
+        person.weeklyTargets[monthKey][w][m.key]=0;
+      }
+    });
+    person.weeklyTargets[monthKey][w].totalInsurance =
+      (Number(person.weeklyTargets[monthKey][w].pcInsurance)||0)+
+      (Number(person.weeklyTargets[monthKey][w].phoneInsurance)||0)+
+      (Number(person.weeklyTargets[monthKey][w].tabletInsurance)||0)+
+      (Number(person.weeklyTargets[monthKey][w].watchInsurance)||0)+
+      (Number(person.weeklyTargets[monthKey][w].airpodsInsurance)||0);
+  }
+}
+
+function getWeeklyTarget(person,key){ensureWeeklyTargets(person);const week=Number(document.getElementById("currentWeek")?.value)||1;return Number(person.weeklyTargets[activeMonthKey][week][key])||0;}
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  if(pageId==='weeklyPage'){
+    editingWeek=Number(document.getElementById('currentWeek').value)||1;
+    document.getElementById('weeklyTab').classList.add('active');
+    renderWeeklyEditor();
+  }else{
+    document.getElementById('dashboardTab').classList.add('active');
+    render();
+  }
+}
+function renderWeeklyEditor(){const tabs=document.getElementById("weekTabs");tabs.innerHTML="";for(let w=1;w<=4;w++){const b=document.createElement("button");b.className="week-tab "+(w===editingWeek?"active":"secondary");const r=getWeekDateRange(w); b.textContent="第 "+w+" 週 "+(new Date().getMonth()+1)+"/"+r.start+"～"+(new Date().getMonth()+1)+"/"+r.end;b.onclick=()=>{editingWeek=w;renderWeeklyEditor();};tabs.appendChild(b);}const head=document.getElementById("weeklyHeader");head.innerHTML="<th>人員</th>";weeklyMetrics.forEach(m=>{const th=document.createElement("th");th.textContent=m.label;head.appendChild(th);});const body=document.getElementById("weeklyBody");body.innerHTML="";people.forEach((person,index)=>{ensureWeeklyTargets(person);const tr=document.createElement("tr");const name=document.createElement("td");name.innerHTML=`<strong>${escapeHtml(person.name)}</strong>`;tr.appendChild(name);weeklyMetrics.forEach(metric=>{const td=document.createElement("td");if(metric.auto){const total=(Number(person.weeklyTargets[activeMonthKey][editingWeek].pcInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].phoneInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].tabletInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].watchInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].airpodsInsurance)||0);person.weeklyTargets[activeMonthKey][editingWeek].totalInsurance=total;td.innerHTML=`<input value="${total}" disabled>`;}else{td.innerHTML=`<input type="number" min="0" step="1" value="${Number(person.weeklyTargets[activeMonthKey][editingWeek][metric.key])||0}" oninput="updateWeeklyTarget(${index},'${metric.key}',this.value)">`;}tr.appendChild(td);});body.appendChild(tr);});renderMobileWeeklyEditor();}
+function updateWeeklyTarget(index,key,value){const person=people[index];ensureWeeklyTargets(person);person.weeklyTargets[activeMonthKey][editingWeek][key]=Number(value)||0;person.weeklyTargets[activeMonthKey][editingWeek].totalInsurance=(Number(person.weeklyTargets[activeMonthKey][editingWeek].pcInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].phoneInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].tabletInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].watchInsurance)||0)+(Number(person.weeklyTargets[activeMonthKey][editingWeek].airpodsInsurance)||0);saveData(false);renderWeeklyEditor();}
+function copyWeekTargets(){if(!confirm("要將目前第 "+editingWeek+" 週的目標複製到其他 3 週嗎？"))return;people.forEach(person=>{ensureWeeklyTargets(person);const source=JSON.parse(JSON.stringify(person.weeklyTargets[activeMonthKey][editingWeek]));for(let w=1;w<=4;w++){if(w!==editingWeek) person.weeklyTargets[w]=JSON.parse(JSON.stringify(source));}});saveData(false);alert("已複製完成");}
+
+function renderMobileMain(){
+  const host=document.getElementById("mobileMain");
+  if(!host) return;
+  host.innerHTML="";
+
+  ensureStoreTargets();
+  const storeCard=document.createElement("div");
+  storeCard.className="mobile-person-card mobile-store";
+  let storeHtml=`<div class="mobile-person-head">
+    <div><strong>🏪 全店</strong><div style="font-size:11px;color:var(--muted);margin-top:4px;">實績自動加總</div></div>
+  </div>`;
+
+  metrics.forEach(metric=>{
+    const target=Number(storeTargets[metric.key])||0;
+    const actual=metric.key==="totalInsurance"
+      ? ["pcInsurance","phoneInsurance","tabletInsurance","watchInsurance","airpodsInsurance"].reduce((s,k)=>s+getStoreActual(k),0)
+      : getStoreActual(metric.key);
+    const rate=calcRate(target,actual);
+    storeHtml+=`<div class="mobile-metric">
+      <div class="mobile-metric-title"><span>${metric.label}</span></div>
+      <div class="mobile-input-grid">
+        <div><label>全店目標</label><input type="number" min="0" step="1" value="${target}" ${metric.auto && metric.key!=="totalInsurance"?"disabled":`oninput="updateStoreTarget('${metric.key}',this.value)"`}></div>
+        <div><label>全店實績</label><input value="${actual}" disabled></div>
+      </div>
+      <div class="mobile-rate-row">
+        <span>達成率</span>
+        <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>
+      </div>
+    </div>`;
+  });
+  storeCard.innerHTML=storeHtml;
+  host.appendChild(storeCard);
+
+  people.forEach((person,index)=>{
+    person.data.totalInsurance.target=insuranceTarget(person);
+    person.data.totalInsurance.actual=insuranceActual(person);
+
+    const card=document.createElement("div");
+    card.className="mobile-person-card";
+    let html=`<div class="mobile-person-head">
+      <input value="${escapeHtml(person.name)}" oninput="updateName(${index},this.value)">
+      <div class="mobile-person-actions">
+        <button class="tiny secondary" onclick="duplicatePerson(${index})">複製</button>
+        <button class="tiny danger" onclick="removePerson(${index})">刪除</button>
+      </div>
+    </div>`;
+
+    metrics.forEach(metric=>{
+      const d=person.data[metric.key];
+      const rate=calcRate(d.target,d.actual);
+      html+=`<div class="mobile-metric">
+        <div class="mobile-metric-title">
+          <span>${metric.label}</span>
+          <span class="rate ${rateClass(rate)}">${rate===null?"未設定":rate.toFixed(1)+"%"}</span>
+        </div>
+        <div class="mobile-input-grid">
+          <div><label>月目標</label><input type="number" min="0" step="1" value="${d.target}" ${metric.auto?"disabled":`oninput="updateMetric(${index},'${metric.key}','target',this.value)"`}></div>
+          <div><label>目前實績</label><input type="number" min="0" step="1" value="${d.actual}" ${metric.auto?"disabled":`oninput="updateMetric(${index},'${metric.key}','actual',this.value)"`}></div>
+        </div>
+        <div class="week-target-line">第 ${Number(document.getElementById("currentWeek")?.value)||1} 週目標：${getWeeklyTarget(person,metric.key)}</div>
+      </div>`;
+    });
+    card.innerHTML=html;
+    host.appendChild(card);
+  });
+}
+
+function renderMobileWeeklyEditor(){
+  const host=document.getElementById("mobileWeeklyEditor");
+  if(!host) return;
+  host.innerHTML="";
+
+  people.forEach((person,index)=>{
+    ensureWeeklyTargets(person);
+    const card=document.createElement("div");
+    card.className="mobile-week-card";
+    let html=`<h3>${escapeHtml(person.name)}</h3>`;
+    weeklyMetrics.forEach(metric=>{
+      if(metric.auto){
+        const total=(Number(person.weeklyTargets[activeMonthKey][editingWeek].pcInsurance)||0)+
+          (Number(person.weeklyTargets[activeMonthKey][editingWeek].phoneInsurance)||0)+
+          (Number(person.weeklyTargets[activeMonthKey][editingWeek].tabletInsurance)||0)+
+          (Number(person.weeklyTargets[activeMonthKey][editingWeek].watchInsurance)||0)+
+          (Number(person.weeklyTargets[activeMonthKey][editingWeek].airpodsInsurance)||0);
+        html+=`<div class="mobile-week-item">
+          <label>${metric.label}</label>
+          <input value="${total}" disabled>
+        </div>`;
+      }else{
+        html+=`<div class="mobile-week-item">
+          <label>${metric.label}</label>
+          <input type="number" min="0" step="1"
+            value="${Number(person.weeklyTargets[activeMonthKey][editingWeek][metric.key])||0}"
+            oninput="updateWeeklyTarget(${index},'${metric.key}',this.value)">
+        </div>`;
+      }
+    });
+    card.innerHTML=html;
+    host.appendChild(card);
+  });
+}
+
+function updateStoreTarget(key,value){
+  storeTargets[key]=Number(value)||0;
+  render();
+}
+function updateName(index,value){
+  people[index].name=value;
+  saveData(false);
+}
+function updateMetric(index,key,field,value){
+  people[index].data[key][field]=Number(value)||0;
+  render();
+}
+function addPerson(){
+  people.push(defaultPerson("新進人員 "+(people.length+1)));
+  render();
+  if(document.getElementById("weeklyPage").classList.contains("active")) renderWeeklyEditor();
+}
+function duplicatePerson(index){
+  const src=JSON.parse(JSON.stringify(people[index]));
+  src.id=crypto.randomUUID ? crypto.randomUUID() : Date.now().toString();
+  src.name=src.name+" 複製";
+  people.push(src);
+  render();
+}
+function removePerson(index){
+  if(!confirm("確定刪除此人員？")) return;
+  people.splice(index,1);
+  render();
+  if(document.getElementById("weeklyPage").classList.contains("active")) renderWeeklyEditor();
+}
+function recalculate(){ render(); }
+
+function saveData(show=true){
+  localStorage.setItem("multiSalesWidgetV2",JSON.stringify({
+    people,
+    storeTargets,
+    elapsedDays:document.getElementById("elapsedDays").value,
+    totalDays:document.getElementById("totalDays").value,
+    redThreshold:document.getElementById("redThreshold").value,
+    greenThreshold:document.getElementById("greenThreshold").value,
+    currentWeek:document.getElementById("currentWeek").value,
+    activeMonthKey
+  }));
+  if(show) alert("資料已儲存");
+}
+
+function loadData(){
+  try{
+    const saved=JSON.parse(localStorage.getItem("multiSalesWidgetV2"));
+    if(saved){
+      people=saved.people||[];
+      storeTargets=saved.storeTargets||{};
+      ["redThreshold","greenThreshold"].forEach(id=>{
+        if(saved[id]!==undefined) document.getElementById(id).value=saved[id];
+      });
+    }
+  }catch(e){}
+  if(!people.length){
+    people=[defaultPerson("人員 1"),defaultPerson("人員 2")];
+  }
+  people.forEach(p=>{
+    metrics.forEach(m=>{if(!p.data[m.key]) p.data[m.key]={target:0,actual:0};});
+    ensureWeeklyTargets(p);
+  });
+  ensureStoreTargets();
+  render();
+}
+
+function resetAll(){
+  if(!confirm("確定清除所有人員與資料？")) return;
+  localStorage.removeItem("multiSalesWidgetV2");
+  people=[defaultPerson("人員 1"),defaultPerson("人員 2")];
+  storeTargets={};
+  document.getElementById("elapsedDays").value=1;
+  document.getElementById("totalDays").value=30;
+  document.getElementById("redThreshold").value=80;
+  document.getElementById("greenThreshold").value=100;
+  initAutomaticCalendar();
+  render();
+}
+
+function exportCSV(){
+  const rows=[];
+  const header=["人員"];
+  metrics.forEach(m=>{
+    header.push(m.label+"目標",m.label+"實績",m.label+"達成率");
+  });
+  rows.push(header);
+
+  const storeRow=["全店"];
+  metrics.forEach(m=>{
+    const target=Number(storeTargets[m.key])||0;
+    const actual=m.key==="totalInsurance"
+      ? ["pcInsurance","phoneInsurance","tabletInsurance","watchInsurance","airpodsInsurance"].reduce((s,k)=>s+getStoreActual(k),0)
+      : getStoreActual(m.key);
+    const r=calcRate(target,actual);
+    storeRow.push(target,actual,r===null?"":r.toFixed(1)+"%");
+  });
+  rows.push(storeRow);
+
+  people.forEach(p=>{
+    const row=[p.name];
+    metrics.forEach(m=>{
+      const d=p.data[m.key];
+      const r=calcRate(d.target,d.actual);
+      row.push(d.target,d.actual,r===null?"":r.toFixed(1)+"%");
+    });
+    rows.push(row);
+  });
+
+  const csv=rows.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="多人員業績試算.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+
+initAutomaticCalendar();
+loadData();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
+}
+</script>
+</body>
+</html>
