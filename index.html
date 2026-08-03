@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#8f6ad9">
+<link rel="manifest" href="manifest.json">
+<title>門市業績管理</title>
+<style>
+:root{--bg:#f5f1fb;--card:#fff;--text:#302a39;--muted:#777080;--accent:#8f6ad9;--accent2:#6aa6d9;--line:#e7e0ef;--good:#2f8e59;--warn:#b5760f;--bad:#bc3f4c}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f7f2ff,#eaf4ff);font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;color:var(--text);padding:20px}.app{max-width:1500px;margin:auto;background:rgba(255,255,255,.94);border-radius:26px;box-shadow:0 20px 60px rgba(86,67,120,.16);overflow:hidden}.top{padding:22px 26px 14px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}h1{margin:0;font-size:24px}.sub{font-size:13px;color:var(--muted);margin-top:6px}.toolbar,.tabs,.week-tabs,.person-actions{display:flex;gap:8px;flex-wrap:wrap}button{border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}.primary,.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}.secondary{background:#f0e9ff;color:var(--accent)}.danger{background:#fdebed;color:#b63b49}.tiny{padding:6px 9px;font-size:11px}.tabs{padding:0 26px 14px;border-bottom:1px solid var(--line)}.page{display:none}.page.active{display:block}.settings{padding:16px 26px;display:grid;grid-template-columns:repeat(5,minmax(145px,1fr));gap:10px}.field,.summary-card,.forecast-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.field label,.mini-label{display:block;font-size:11px;color:var(--muted);font-weight:800;margin-bottom:6px}input,select{width:100%;border:1px solid #ddd4e7;border-radius:10px;padding:9px;font-size:14px;background:#fff}input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(143,106,217,.12)}.summary{padding:0 26px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.summary-card strong,.forecast-card strong{font-size:20px}.forecast-title{padding:0 26px 10px;font-size:17px;font-weight:900}.forecasts{padding:0 26px 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.forecast-meta{font-size:11px;margin-top:6px;color:var(--muted)}.goodText{color:var(--good)}.warnText{color:var(--warn)}.badText{color:var(--bad)}.table-wrap{margin:0 26px 26px;border:1px solid var(--line);border-radius:18px;overflow:auto;background:#fff}table{border-collapse:separate;border-spacing:0;min-width:1750px;width:100%;font-size:12px}th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;text-align:center}th{position:sticky;top:0;background:#f5effc;z-index:3}th:first-child,td:first-child{position:sticky;left:0;background:#fff;z-index:2;min-width:165px}th:first-child{z-index:4;background:#eee5fa}.cell-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cell-grid input{padding:7px;font-size:12px}.rate{display:inline-block;margin-top:6px;border-radius:999px;padding:4px 7px;font-weight:900}.good{background:#e3f6eb;color:var(--good)}.warn{background:#fff2d3;color:var(--warn)}.bad{background:#fde7ea;color:var(--bad)}.na{background:#eee;color:#777}.store-row td{background:#faf7ff;font-weight:800}.drag{cursor:grab;font-size:17px;color:var(--muted);padding:4px}.week-rate{font-size:10px;margin-top:5px}.page-title{padding:20px 26px 12px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.page-title h2{margin:0}.weekly-table{min-width:2100px}.note{padding:0 26px 24px;font-size:12px;color:var(--muted);line-height:1.7}.lag-summary{padding:0 26px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.lag-table{min-width:900px}.lag-empty{margin:0 26px 26px;padding:28px;text-align:center;background:#eef8f2;border:1px solid #d8eee0;border-radius:18px;color:var(--good);font-weight:900}.gap-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:#fde7ea;color:var(--bad);font-weight:900}.mobile-lag-list{padding:0 16px 20px}.lag-card{background:#fff;border:1px solid var(--line);border-left:5px solid var(--bad);border-radius:16px;padding:13px;margin-bottom:10px}.lag-card-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:9px}.lag-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--muted)}.lag-card-grid strong{display:block;color:var(--text);font-size:15px;margin-top:3px}
+.meeting-summary{padding:0 26px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.meeting-table{min-width:1100px}.meeting-empty{margin:0 26px 26px;padding:28px;text-align:center;background:#eef8f2;border:1px solid #d8eee0;border-radius:18px;color:var(--good);font-weight:900}.status-pill{display:inline-block;padding:5px 9px;border-radius:999px;font-weight:900}.status-bad{background:#fde7ea;color:var(--bad)}.status-warn{background:#fff2d3;color:var(--warn)}.meeting-card{background:#fff;border:1px solid var(--line);border-left:5px solid var(--bad);border-radius:16px;padding:13px;margin-bottom:10px}.meeting-card-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--muted)}.meeting-card-grid strong{display:block;color:var(--text);font-size:15px;margin-top:3px}
+.mobile-only{display:none}
+@media(max-width:900px){body{padding:0;background:var(--bg)}.app{border-radius:0;min-height:100vh;box-shadow:none}.top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);padding:16px}.toolbar{width:100%;display:grid;grid-template-columns:1fr 1fr}.tabs{padding:0 16px 12px;position:sticky;top:112px;z-index:25;background:#fff}.settings{padding:12px 16px;grid-template-columns:1fr 1fr}.summary{padding:0 16px 12px;grid-template-columns:1fr 1fr}.forecasts{padding:0 16px 16px;grid-template-columns:1fr 1fr}.forecast-title{padding:0 16px 8px}.desktop-only{display:none!important}.mobile-only{display:block}.mobile-list{padding:0 16px 20px}.person-card{background:#fff;border:1px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden;box-shadow:0 7px 20px rgba(86,67,120,.08)}.person-card.dragging{opacity:.5}.person-head{padding:12px;background:#f7f2fc;display:flex;align-items:center;gap:8px}.person-head input{font-weight:900;font-size:16px}.metric-card{padding:12px;border-top:1px solid var(--line)}.metric-title{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:900;margin-bottom:9px}.mobile-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mobile-grid input{font-size:16px;padding:11px}.weekly-mobile{padding:0 16px 20px}.week-person{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;margin-bottom:12px}.week-person h3{margin:0 0 12px}.week-item{padding:10px 0;border-top:1px solid var(--line)}.week-item:first-of-type{border-top:0}.page-title{padding:16px}.week-tabs{overflow:auto;flex-wrap:nowrap;padding-bottom:6px}.note{padding:0 16px 20px}.lag-summary{padding:0 16px 12px;grid-template-columns:1fr 1fr}.lag-empty,.meeting-empty{margin:0 16px 20px}.lag-table-wrap,.meeting-table-wrap{display:none!important}.meeting-summary{padding:0 16px 12px;grid-template-columns:1fr 1fr}}
+
+.report-summary{padding:0 26px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.report-layout{padding:0 26px 26px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.report-box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.report-box h3{margin:0 0 10px}.report-list{display:grid;gap:8px}.report-row{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center}.report-row small{display:block;color:var(--muted);margin-top:3px}.report-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.report-text{width:100%;min-height:230px;resize:vertical;line-height:1.7}.history-table{min-width:760px}.priority-high{border-left:5px solid var(--bad)}.priority-medium{border-left:5px solid var(--warn)}.priority-low{border-left:5px solid var(--good)}
+@media(max-width:900px){.report-summary{padding:0 16px 12px;grid-template-columns:1fr 1fr}.report-layout{padding:0 16px 20px;grid-template-columns:1fr}.report-box{padding:13px}}
+
+.import-panel{margin:0 26px 16px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#faf7ff;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.import-status{font-size:13px;line-height:1.6;color:var(--muted)}.import-status strong{color:var(--text)}.import-ok{color:var(--good)!important}.import-error{color:var(--bad)!important}@media(max-width:900px){.import-panel{margin:0 16px 12px;padding:12px}.import-panel button{width:100%}}
+</style>
+</head>
+<body><main class="app">
+<header class="top"><div><h1 id="appTitle">門市業績管理</h1><div class="sub">月目標、每週完成率、人員排序與月底預估</div></div><div class="toolbar"><button class="primary" onclick="document.getElementById('excelImportInput').click()">📥 匯入業績追蹤.xlsx</button><input id="excelImportInput" type="file" accept=".xlsx,.xls" hidden onchange="importTrackingWorkbook(this.files[0]);this.value=''"><button class="secondary" onclick="addPerson()">＋新增人員</button><button class="secondary" onclick="exportCSV()">匯出 CSV</button><button class="secondary" onclick="saveData(true)">儲存資料</button><button class="danger" onclick="resetAll()">全部重設</button></div></header>
+<nav class="tabs"><button id="dashboardTab" class="active" onclick="showPage('dashboardPage')">業績試算</button><button id="weeklyTab" class="secondary" onclick="showPage('weeklyPage')">每週目標分配</button><button id="lagTab" class="secondary" onclick="showPage('lagPage')">落後進度表</button><button id="meetingTab" class="secondary" onclick="showPage('meetingPage')">週日會議名單</button><button id="reportsTab" class="secondary" onclick="showPage('reportsPage')">店長報表</button></nav>
+<div class="import-panel"><div><strong>每日 Excel 匯入</strong><div id="importStatus" class="import-status">尚未匯入。請選擇「業績追蹤.xlsx」，系統會自動讀取本月資料。</div></div><button class="primary" onclick="document.getElementById('excelImportInput').click()">選擇 Excel</button></div>
+<section id="dashboardPage" class="page active">
+<div class="settings"><div class="field"><label>目前月份</label><input id="monthDisplay" disabled></div><div class="field"><label>目前週次</label><input id="weekDisplay" disabled></div><div class="field"><label>已過天數</label><input id="elapsedDays" disabled></div><div class="field"><label>本月總天數</label><input id="totalDays" disabled></div><div class="field"><label>達標門檻</label><input id="greenThreshold" type="number" value="100" oninput="renderAll()"></div></div>
+<div class="summary"><div class="summary-card"><span class="mini-label">總保險實績</span><strong id="summaryInsurance">0</strong></div><div class="summary-card"><span class="mini-label">總門號實績</span><strong id="summaryLines">0</strong></div><div class="summary-card"><span class="mini-label">目前人員</span><strong id="summaryPeople">0</strong></div></div>
+<div class="forecast-title">月底預估</div><div class="forecasts" id="forecastCards"></div>
+<div class="table-wrap desktop-only"><table><thead><tr id="mainHeader"><th>人員／排序</th></tr></thead><tbody id="mainBody"></tbody></table></div>
+<div id="mobileMain" class="mobile-only mobile-list"></div>
+<div class="note">月底預估以「目前實績 ÷ 已過天數 × 本月總天數」計算。人員可拖曳排序，也可使用上移／下移按鈕。</div>
+</section>
+<section id="weeklyPage" class="page"><div class="page-title"><div><h2>每週目標分配</h2><div class="sub">每月固定 1～4 週，星期日開始；目標與實績不跨月。</div></div><div class="toolbar"><button class="primary" onclick="autoGenerateRemainingWeeklyTargets(true)">自動生成剩餘週目標</button><button class="secondary" onclick="copyWeekTargets()">複製本週目標到其他週</button></div></div><div style="padding:0 26px 12px"><div class="week-tabs" id="weekTabs"></div></div><div class="table-wrap desktop-only"><table class="weekly-table"><thead><tr id="weeklyHeader"><th>人員</th></tr></thead><tbody id="weeklyBody"></tbody></table></div><div id="mobileWeekly" class="mobile-only weekly-mobile"></div><div class="note">可手動調整週目標，也可按「自動生成剩餘週目標」，系統會用月目標扣除已完成數，再依本月剩餘天數分配到目前週至第 4 週。</div></section>
+<section id="lagPage" class="page">
+  <div class="page-title"><div><h2>落後進度表</h2><div class="sub">只顯示低於今日應達進度的項目，差距較大者排在前面。</div></div></div>
+  <div class="lag-summary">
+    <div class="summary-card"><span class="mini-label">落後項目</span><strong id="lagCount">0</strong></div>
+    <div class="summary-card"><span class="mini-label">落後人員</span><strong id="lagPeopleCount">0</strong></div>
+    <div class="summary-card"><span class="mini-label">今日應達進度</span><strong id="expectedProgress">0%</strong></div>
+  </div>
+  <div id="lagEmpty" class="lag-empty" style="display:none">目前沒有落後項目 🎉</div>
+  <div class="table-wrap lag-table-wrap desktop-only"><table class="lag-table"><thead><tr><th>人員</th><th>落後項目</th><th>目前達成</th><th>應達進度</th><th>差距</th><th>剩餘每日需完成</th></tr></thead><tbody id="lagBody"></tbody></table></div>
+  <div id="mobileLag" class="mobile-only mobile-lag-list"></div>
+  <div class="note">判斷方式：今日應達進度＝已過天數 ÷ 本月總天數。僅列出已設定月目標且實際達成率低於應達進度的項目。</div>
+</section>
+
+<section id="meetingPage" class="page">
+ <div class="page-title"><div><h2>週日店內會議名單</h2><div class="sub">每日更新；只列本週實際進度落後的人員，供週日下班會議使用。</div></div><button class="secondary" onclick="exportMeetingCSV()">匯出會議名單</button></div>
+ <div class="meeting-summary">
+  <div class="summary-card"><span class="mini-label">落後人員</span><strong id="meetingPeopleCount">0</strong></div>
+  <div class="summary-card"><span class="mini-label">落後項目</span><strong id="meetingItemCount">0</strong></div>
+  <div class="summary-card"><span class="mini-label">目前週次</span><strong id="meetingWeekLabel">第 1 週</strong></div>
+  <div class="summary-card"><span class="mini-label">會議日期</span><strong id="meetingDateLabel">—</strong></div>
+ </div>
+ <div id="meetingEmpty" class="meeting-empty" style="display:none">本週目前沒有落後人員 🎉</div>
+ <div class="table-wrap meeting-table-wrap desktop-only"><table class="meeting-table"><thead><tr><th>人員</th><th>項目</th><th>本週目標</th><th>本週實際</th><th>本週完成率</th><th>本週還差</th><th>月實際達成</th><th>月底預估達成</th><th>狀態</th></tr></thead><tbody id="meetingBody"></tbody></table></div>
+ <div id="mobileMeeting" class="mobile-only mobile-lag-list"></div>
+ <div class="note">名單判定：本週有設定目標，且本週實際小於本週目標。月底預估以目前月累計速度推算。</div>
+</section>
+</main>
+
+<section id="reportsPage" class="page">
+ <div class="page-title"><div><h2>店長報表</h2><div class="sub">歷史月份、週報、追蹤名單、PowerPoint 與 LINE 分享集中管理。</div></div><div class="toolbar"><button class="primary" onclick="archiveCurrentMonth(true)">封存目前月份</button><button class="secondary" onclick="renderManagerReports()">重新分析</button></div></div>
+ <div class="report-summary">
+  <div class="summary-card"><span class="mini-label">歷史月份</span><strong id="historyCount">0</strong></div>
+  <div class="summary-card"><span class="mini-label">本週落後人員</span><strong id="reportLagPeople">0</strong></div>
+  <div class="summary-card"><span class="mini-label">優先追蹤</span><strong id="priorityCount">0</strong></div>
+  <div class="summary-card"><span class="mini-label">週報期間</span><strong id="reportWeekLabel">—</strong></div>
+ </div>
+ <div class="report-layout">
+  <div class="report-box"><h3>AI 建議追蹤名單</h3><div class="sub" style="margin-bottom:10px">依本週差距、月底預估與落後項目數自動排序。</div><div id="trackingList" class="report-list"></div></div>
+  <div class="report-box"><h3>店長週報</h3><textarea id="weeklyReportText" class="report-text" readonly></textarea><div class="report-actions"><button class="primary" onclick="downloadWeeklyReport()">下載週報</button><button class="secondary" onclick="shareLineKPI()">LINE 分享每日 KPI</button><button class="secondary" onclick="downloadWeeklyPPT()">產生 PowerPoint</button></div></div>
+  <div class="report-box" style="grid-column:1/-1"><h3>歷史月份分析</h3><div class="sub" style="margin-bottom:10px">每次儲存或封存時保留該月全店 KPI，可比較月目標、實績與達成率。</div><div class="table-wrap" style="margin:0"><table class="history-table"><thead><tr><th>月份</th><th>總保險</th><th>總門號</th><th>GA／NP</th><th>999以上</th><th>平均達成率</th></tr></thead><tbody id="historyBody"></tbody></table></div></div>
+ </div>
+</section>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const metrics=[
+ {key:'pcInsurance',label:'電腦保險'},
+ {key:'phoneInsurance',label:'手機保險'},
+ {key:'tabletInsurance',label:'平板保險'},
+ {key:'watchAudioInsurance',label:'手錶／耳機保險'},
+ {key:'totalInsurance',label:'總保險',auto:true},
+ {key:'totalLines',label:'總門號'},
+ {key:'ganp',label:'GA / NP'},
+ {key:'above999',label:'999以上'}
+];
+const weeklyExtras=[{key:'highTicketSpeaker',label:'高單喇叭顆數'},{key:'googleReviews',label:'Google 評論則數'},{key:'tradeIn',label:'舊換新目標'}];
+const weeklyMetrics=[...metrics,...weeklyExtras];
+const insuranceKeys=['pcInsurance','phoneInsurance','tabletInsurance','watchAudioInsurance'];
+let people=[],storeTargets={},editingWeek=1,activeMonthKey='';
+const uid=()=>crypto.randomUUID?crypto.randomUUID():Date.now()+Math.random().toString(16).slice(2);
+function monthKey(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function weekRanges(d=new Date()){const y=d.getFullYear(),m=d.getMonth(),last=new Date(y,m+1,0).getDate(),firstDow=new Date(y,m,1).getDay();let firstSat=firstDow===0?7:7-firstDow;firstSat=Math.min(firstSat,last);return [{start:1,end:firstSat},{start:firstSat+1,end:Math.min(firstSat+7,last)},{start:firstSat+8,end:Math.min(firstSat+14,last)},{start:Math.min(firstSat+15,last),end:last}].map(r=>({start:Math.min(r.start,last),end:Math.max(Math.min(r.end,last),Math.min(r.start,last))}))}
+function currentWeek(d=new Date()){const day=d.getDate(),ranges=weekRanges(d);for(let i=0;i<4;i++)if(day>=ranges[i].start&&day<=ranges[i].end)return i+1;return 4}
+function initCalendar(){const d=new Date(),w=currentWeek(d),r=weekRanges(d)[w-1];activeMonthKey=monthKey(d);editingWeek=w;monthDisplay.value=`${d.getFullYear()}年${d.getMonth()+1}月`;weekDisplay.value=`第 ${w} 週（${d.getMonth()+1}/${r.start}～${d.getMonth()+1}/${r.end}）`;elapsedDays.value=d.getDate();totalDays.value=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();appTitle.textContent=`${d.getFullYear()}年${d.getMonth()+1}月 門市業績管理`}
+function defaultPerson(name){const p={id:uid(),name,data:{},weekly:{}};metrics.forEach(m=>p.data[m.key]={target:0,actual:0});ensureWeekly(p);return p}
+function ensureWeekly(p){if(!p.weekly)p.weekly={};if(!p.weekly[activeMonthKey])p.weekly[activeMonthKey]={};for(let w=1;w<=4;w++){if(!p.weekly[activeMonthKey][w])p.weekly[activeMonthKey][w]={};weeklyMetrics.forEach(m=>{if(!p.weekly[activeMonthKey][w][m.key])p.weekly[activeMonthKey][w][m.key]={target:0,actual:0}});syncWeeklyInsurance(p,w)}}
+function syncPersonInsurance(p){p.data.totalInsurance.actual=insuranceKeys.reduce((s,k)=>s+(+p.data[k].actual||0),0)+(+p.extraTotalInsuranceMonthly||0)}
+function syncWeeklyInsurance(p,w){const cell=p.weekly[activeMonthKey][w].totalInsurance||(p.weekly[activeMonthKey][w].totalInsurance={target:0,actual:0});const extra=p.weekly[activeMonthKey][w]._extraTotalInsurance||0;cell.actual=insuranceKeys.reduce((s,k)=>s+(+p.weekly[activeMonthKey][w][k].actual||0),0)+(+extra||0)}
+function rate(t,a){return +t>0?(+a||0)/(+t)*100:null}function rateClass(r){if(r===null)return'na';if(r>=100)return'good';if(r>=80)return'warn';return'bad'}function rateText(r){return r===null?'未設定':r.toFixed(1)+'%'}
+function storeActual(k){return people.reduce((s,p)=>s+(+p.data[k].actual||0),0)}
+function storeTarget(k){return +storeTargets[k]||0}
+function format(n){return Math.round(+n||0).toLocaleString('zh-TW')}
+function migratePerson(p){p.id=p.id||uid();p.name=p.name||'人員';p.data=p.data||{};const oldWatch=p.data.watchInsurance,oldAir=p.data.airpodsInsurance;metrics.forEach(m=>{if(!p.data[m.key])p.data[m.key]={target:0,actual:0}});if((oldWatch||oldAir)&&!p._mergedWatchAudio){p.data.watchAudioInsurance={target:(+oldWatch?.target||0)+(+oldAir?.target||0),actual:(+oldWatch?.actual||0)+(+oldAir?.actual||0)};p._mergedWatchAudio=true}ensureWeekly(p);syncPersonInsurance(p)}
+function renderAll(){people.forEach(p=>{ensureWeekly(p);syncPersonInsurance(p)});renderDashboard();renderWeekly();renderLagReport();renderMeetingReport();if(document.getElementById('reportsPage'))renderManagerReports();saveData(false)}
+function renderDashboard(){mainHeader.innerHTML='<th>人員／排序</th>';metrics.forEach(m=>mainHeader.innerHTML+=`<th>${m.label}</th>`);mainBody.innerHTML='';renderStoreRow();people.forEach((p,i)=>renderPersonRow(p,i));renderMobile();summaryInsurance.textContent=format(storeActual('totalInsurance'));summaryLines.textContent=format(storeActual('totalLines'));summaryPeople.textContent=people.length;renderForecasts();enableDesktopDrag()}
+function metricCell(target,actual,disabled,onTarget,onActual,extra=''){const r=rate(target,actual);return `<div class="cell-grid"><div><span class="mini-label">目標</span><input type="number" value="${target}" ${disabled?'disabled':`oninput="${onTarget}"`}></div><div><span class="mini-label">實績</span><input type="number" value="${actual}" ${disabled?'disabled':`oninput="${onActual}"`}></div></div><span class="rate ${rateClass(r)}">${rateText(r)}</span>${extra}`}
+function renderStoreRow(){const tr=document.createElement('tr');tr.className='store-row';tr.innerHTML='<td>🏪 全店<br><small>實績自動加總</small></td>';metrics.forEach(m=>{const td=document.createElement('td'),t=storeTarget(m.key),a=storeActual(m.key);td.innerHTML=metricCell(t,a,false,`setStoreTarget('${m.key}',this.value)`,'',m.auto?'':'');td.querySelectorAll('input')[1].disabled=true;tr.appendChild(td)});mainBody.appendChild(tr)}
+function personControls(i){return `<div class="person-actions"><span class="drag" title="拖曳排序">☰</span><button class="tiny secondary" onclick="movePerson(${i},-1)">↑</button><button class="tiny secondary" onclick="movePerson(${i},1)">↓</button><button class="tiny secondary" onclick="duplicatePerson(${i})">複製</button><button class="tiny danger" onclick="removePerson(${i})">刪除</button></div>`}
+function renderPersonRow(p,i){const tr=document.createElement('tr');tr.draggable=true;tr.dataset.index=i;tr.innerHTML=`<td><input value="${esc(p.name)}" oninput="renamePerson(${i},this.value)">${personControls(i)}</td>`;metrics.forEach(m=>{const d=p.data[m.key],td=document.createElement('td'),wr=rate(p.weekly[activeMonthKey][currentWeek()][m.key].target,p.weekly[activeMonthKey][currentWeek()][m.key].actual);const manualTotal=m.key==='totalInsurance';td.innerHTML=metricCell(d.target,d.actual,m.auto&&!manualTotal,`setMetric(${i},'${m.key}','target',this.value)`,`setMetric(${i},'${m.key}','actual',this.value)`,`<div class="week-rate">本週完成率：<span class="rate ${rateClass(wr)}">${rateText(wr)}</span></div>`);if(manualTotal)td.querySelectorAll('input')[1].disabled=true;tr.appendChild(td)});mainBody.appendChild(tr)}
+function renderMobile(){mobileMain.innerHTML='';const store=document.createElement('div');store.className='person-card';let sh='<div class="person-head"><strong>🏪 全店</strong></div>';metrics.forEach(m=>{const t=storeTarget(m.key),a=storeActual(m.key),r=rate(t,a);sh+=`<div class="metric-card"><div class="metric-title"><span>${m.label}</span><span class="rate ${rateClass(r)}">${rateText(r)}</span></div><div class="mobile-grid"><div><span class="mini-label">全店目標</span><input type="number" value="${t}" oninput="setStoreTarget('${m.key}',this.value)"></div><div><span class="mini-label">全店實績</span><input value="${a}" disabled></div></div></div>`});store.innerHTML=sh;mobileMain.appendChild(store);people.forEach((p,i)=>{const c=document.createElement('div');c.className='person-card';c.draggable=true;c.dataset.index=i;let h=`<div class="person-head"><span class="drag">☰</span><input value="${esc(p.name)}" oninput="renamePerson(${i},this.value)">${personControls(i)}</div>`;metrics.forEach(m=>{const d=p.data[m.key],r=rate(d.target,d.actual),w=p.weekly[activeMonthKey][currentWeek()][m.key],wr=rate(w.target,w.actual),manualTotal=m.key==='totalInsurance';h+=`<div class="metric-card"><div class="metric-title"><span>${m.label}</span><span class="rate ${rateClass(r)}">月 ${rateText(r)}</span></div><div class="mobile-grid"><div><span class="mini-label">月目標</span><input type="number" value="${d.target}" ${m.auto&&!manualTotal?'disabled':`oninput="setMetric(${i},'${m.key}','target',this.value)"`}></div><div><span class="mini-label">目前實績</span><input type="number" value="${d.actual}" ${m.auto||manualTotal?'disabled':`oninput="setMetric(${i},'${m.key}','actual',this.value)"`}></div></div><div class="week-rate">本週：${w.actual}/${w.target}　<span class="rate ${rateClass(wr)}">${rateText(wr)}</span></div></div>`});c.innerHTML=h;mobileMain.appendChild(c)});enableMobileDrag()}
+function renderForecasts(){const keys=['totalLines','totalInsurance','ganp','above999'];forecastCards.innerHTML='';keys.forEach(k=>{const m=metrics.find(x=>x.key===k),actual=storeActual(k),forecast=actual/(+elapsedDays.value||1)*(+totalDays.value||1),target=storeTarget(k),r=rate(target,forecast),cls=r===null?'warnText':r>=100?'goodText':'badText';forecastCards.innerHTML+=`<div class="forecast-card"><span class="mini-label">月底預估${m.label}</span><strong class="${cls}">${format(forecast)}</strong><div class="forecast-meta">全店目標 ${format(target)}｜預估達成 ${rateText(r)}</div></div>`})}
+function renderWeekly(){const ranges=weekRanges();weekTabs.innerHTML='';for(let w=1;w<=4;w++){const b=document.createElement('button'),r=ranges[w-1];b.className=w===editingWeek?'active':'secondary';b.textContent=`第 ${w} 週 ${new Date().getMonth()+1}/${r.start}～${new Date().getMonth()+1}/${r.end}`;b.onclick=()=>{editingWeek=w;renderWeekly()};weekTabs.appendChild(b)}weeklyHeader.innerHTML='<th>人員</th>';weeklyMetrics.forEach(m=>weeklyHeader.innerHTML+=`<th>${m.label}</th>`);weeklyBody.innerHTML='';people.forEach((p,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${esc(p.name)}</strong></td>`;weeklyMetrics.forEach(m=>{const d=p.weekly[activeMonthKey][editingWeek][m.key],td=document.createElement('td');const manualTotal=m.key==='totalInsurance';td.innerHTML=metricCell(d.target,d.actual,m.auto&&!manualTotal,`setWeekly(${i},${editingWeek},'${m.key}','target',this.value)`,`setWeekly(${i},${editingWeek},'${m.key}','actual',this.value)`);if(manualTotal)td.querySelectorAll('input')[1].disabled=true;tr.appendChild(td)});weeklyBody.appendChild(tr)});renderMobileWeekly()}
+function renderMobileWeekly(){mobileWeekly.innerHTML='';people.forEach((p,i)=>{const c=document.createElement('div');c.className='week-person';let h=`<h3>${esc(p.name)}</h3>`;weeklyMetrics.forEach(m=>{const d=p.weekly[activeMonthKey][editingWeek][m.key],r=rate(d.target,d.actual);h+=`<div class="week-item"><div class="metric-title"><span>${m.label}</span><span class="rate ${rateClass(r)}">${rateText(r)}</span></div><div class="mobile-grid"><div><span class="mini-label">週目標</span><input type="number" value="${d.target}" ${m.auto&&m.key!=='totalInsurance'?'disabled':`oninput="setWeekly(${i},${editingWeek},'${m.key}','target',this.value)"`}></div><div><span class="mini-label">本週實績</span><input type="number" value="${d.actual}" ${m.auto?'disabled':`oninput="setWeekly(${i},${editingWeek},'${m.key}','actual',this.value)"`}></div></div></div>`});c.innerHTML=h;mobileWeekly.appendChild(c)})}
+function renderLagReport(){
+ const expected=(+elapsedDays.value||0)/(+totalDays.value||1)*100;
+ const remaining=Math.max((+totalDays.value||1)-(+elapsedDays.value||0),0);
+ const rows=[];
+ people.forEach(p=>metrics.forEach(m=>{
+   const d=p.data[m.key],target=+d.target||0,actual=+d.actual||0;
+   if(target<=0)return;
+   const actualRate=actual/target*100;
+   if(actualRate+0.0001<expected){
+     rows.push({person:p.name,label:m.label,actualRate,expected,gap:expected-actualRate,daily:remaining>0?Math.max(target-actual,0)/remaining:Math.max(target-actual,0)});
+   }
+ }));
+ rows.sort((a,b)=>b.gap-a.gap||a.person.localeCompare(b.person,'zh-Hant'));
+ lagCount.textContent=rows.length;
+ lagPeopleCount.textContent=new Set(rows.map(x=>x.person)).size;
+ expectedProgress.textContent=expected.toFixed(1)+'%';
+ lagEmpty.style.display=rows.length?'none':'block';
+ lagBody.innerHTML='';mobileLag.innerHTML='';
+ rows.forEach(x=>{
+   const tr=document.createElement('tr');
+   tr.innerHTML=`<td><strong>${esc(x.person)}</strong></td><td>${x.label}</td><td>${x.actualRate.toFixed(1)}%</td><td>${x.expected.toFixed(1)}%</td><td><span class="gap-badge">-${x.gap.toFixed(1)}%</span></td><td><strong>${format(x.daily)}</strong></td>`;
+   lagBody.appendChild(tr);
+   const card=document.createElement('div');card.className='lag-card';
+   card.innerHTML=`<div class="lag-card-head"><div><strong>${esc(x.person)}</strong><div class="mini-label" style="margin:3px 0 0">${x.label}</div></div><span class="gap-badge">落後 ${x.gap.toFixed(1)}%</span></div><div class="lag-card-grid"><div>目前達成<strong>${x.actualRate.toFixed(1)}%</strong></div><div>今日應達<strong>${x.expected.toFixed(1)}%</strong></div><div style="grid-column:1/-1">剩餘每日需完成<strong>${format(x.daily)}</strong></div></div>`;
+   mobileLag.appendChild(card);
+ });
+}
+
+function remainingWeekWeights(){
+ const d=new Date(),cw=currentWeek(d),ranges=weekRanges(d),weights={};
+ for(let w=cw;w<=4;w++){
+   const r=ranges[w-1];
+   weights[w]=w===cw?Math.max(r.end-d.getDate()+1,0):Math.max(r.end-r.start+1,0);
+ }
+ return weights;
+}
+function distributeInteger(total,weights){
+ const keys=Object.keys(weights).map(Number).filter(k=>weights[k]>0),sum=keys.reduce((s,k)=>s+weights[k],0),out={};
+ if(total<=0||!sum){keys.forEach(k=>out[k]=0);return out}
+ let used=0;keys.forEach((k,idx)=>{if(idx===keys.length-1){out[k]=Math.max(total-used,0)}else{out[k]=Math.floor(total*weights[k]/sum);used+=out[k]}});return out;
+}
+function autoGenerateRemainingWeeklyTargets(showMessage=false){
+ const cw=currentWeek(),weights=remainingWeekWeights();
+ people.forEach(p=>{
+   metrics.forEach(m=>{
+     const remaining=Math.max((+p.data[m.key].target||0)-(+p.data[m.key].actual||0),0);
+     const allocation=distributeInteger(Math.ceil(remaining),weights);
+     for(let w=cw;w<=4;w++)p.weekly[activeMonthKey][w][m.key].target=allocation[w]||0;
+   });
+   for(let w=cw;w<=4;w++)syncWeeklyInsurance(p,w);
+ });
+ renderAll();if(showMessage)alert('已依月目標扣除已完成數，重新分配目前週到月底的剩餘週目標。');
+}
+function nextSunday(d=new Date()){
+ const x=new Date(d),add=(7-x.getDay())%7;x.setDate(x.getDate()+add);return x;
+}
+function meetingRows(){
+ const w=currentWeek(),days=+elapsedDays.value||1,total=+totalDays.value||1,rows=[];
+ people.forEach(p=>metrics.forEach(m=>{
+   const wd=p.weekly[activeMonthKey][w][m.key],wt=+wd.target||0,wa=+wd.actual||0;
+   if(wt<=0||wa>=wt)return;
+   const md=p.data[m.key],mt=+md.target||0,ma=+md.actual||0;
+   const monthActualRate=rate(mt,ma),forecast=ma/days*total,forecastRate=rate(mt,forecast),weekRate=rate(wt,wa);
+   rows.push({person:p.name,key:m.key,label:m.label,weekTarget:wt,weekActual:wa,weekRate,gap:Math.max(wt-wa,0),monthActualRate,forecastRate});
+ }));
+ return rows.sort((a,b)=>(a.weekRate??0)-(b.weekRate??0)||b.gap-a.gap||a.person.localeCompare(b.person,'zh-Hant'));
+}
+function renderMeetingReport(){
+ const rows=meetingRows(),w=currentWeek(),sun=nextSunday();
+ meetingPeopleCount.textContent=new Set(rows.map(x=>x.person)).size;meetingItemCount.textContent=rows.length;meetingWeekLabel.textContent='第 '+w+' 週';meetingDateLabel.textContent=`${sun.getMonth()+1}/${sun.getDate()}`;
+ meetingEmpty.style.display=rows.length?'none':'block';meetingBody.innerHTML='';mobileMeeting.innerHTML='';
+ rows.forEach(x=>{
+   const forecastOK=x.forecastRate!==null&&x.forecastRate>=100,status=forecastOK?'本週落後／月底可達':'本週落後／月底預估不足',statusClass=forecastOK?'status-warn':'status-bad';
+   const tr=document.createElement('tr');tr.innerHTML=`<td><strong>${esc(x.person)}</strong></td><td>${x.label}</td><td>${format(x.weekTarget)}</td><td>${format(x.weekActual)}</td><td><span class="rate ${rateClass(x.weekRate)}">${rateText(x.weekRate)}</span></td><td><strong>${format(x.gap)}</strong></td><td>${rateText(x.monthActualRate)}</td><td>${rateText(x.forecastRate)}</td><td><span class="status-pill ${statusClass}">${status}</span></td>`;meetingBody.appendChild(tr);
+   const card=document.createElement('div');card.className='meeting-card';card.innerHTML=`<div class="lag-card-head"><div><strong>${esc(x.person)}</strong><div class="mini-label" style="margin:3px 0 0">${x.label}</div></div><span class="status-pill ${statusClass}">${status}</span></div><div class="meeting-card-grid"><div>本週實際／目標<strong>${format(x.weekActual)} / ${format(x.weekTarget)}</strong></div><div>本週完成率<strong>${rateText(x.weekRate)}</strong></div><div>本週還差<strong>${format(x.gap)}</strong></div><div>月實際達成<strong>${rateText(x.monthActualRate)}</strong></div><div style="grid-column:1/-1">月底預估達成<strong>${rateText(x.forecastRate)}</strong></div></div>`;mobileMeeting.appendChild(card);
+ });
+}
+function exportMeetingCSV(){
+ const rows=[['人員','項目','本週目標','本週實際','本週完成率','本週還差','月實際達成','月底預估達成']];meetingRows().forEach(x=>rows.push([x.person,x.label,x.weekTarget,x.weekActual,rateText(x.weekRate),x.gap,rateText(x.monthActualRate),rateText(x.forecastRate)]));
+ const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=activeMonthKey+'_週日會議名單.csv';a.click();
+}
+function setStoreTarget(k,v){storeTargets[k]=+v||0;renderAll()}function setMetric(i,k,f,v){people[i].data[k][f]=+v||0;renderAll()}function setWeekly(i,w,k,f,v){people[i].weekly[activeMonthKey][w][k][f]=+v||0;syncWeeklyInsurance(people[i],w);renderAll()}function renamePerson(i,v){people[i].name=v;saveData(false)}
+function addPerson(){people.push(defaultPerson('新進人員 '+(people.length+1)));renderAll()}function duplicatePerson(i){const p=JSON.parse(JSON.stringify(people[i]));p.id=uid();p.name+=' 複製';people.push(p);renderAll()}function removePerson(i){if(confirm('確定刪除此人員？')){people.splice(i,1);renderAll()}}function movePerson(i,d){const n=i+d;if(n<0||n>=people.length)return;[people[i],people[n]]=[people[n],people[i]];renderAll()}
+let dragIndex=null;function enableDesktopDrag(){mainBody.querySelectorAll('tr[draggable=true]').forEach(tr=>{tr.ondragstart=()=>{dragIndex=+tr.dataset.index};tr.ondragover=e=>e.preventDefault();tr.ondrop=e=>{e.preventDefault();reorder(dragIndex,+tr.dataset.index)}})}function enableMobileDrag(){mobileMain.querySelectorAll('.person-card[draggable=true]').forEach(c=>{c.ondragstart=()=>{dragIndex=+c.dataset.index;c.classList.add('dragging')};c.ondragend=()=>c.classList.remove('dragging');c.ondragover=e=>e.preventDefault();c.ondrop=e=>{e.preventDefault();reorder(dragIndex,+c.dataset.index)}})}function reorder(a,b){if(a===null||a===b)return;const [p]=people.splice(a,1);people.splice(b,0,p);dragIndex=null;renderAll()}
+function copyWeekTargets(){if(!confirm(`將第 ${editingWeek} 週目標複製到其他三週？實績不會複製。`))return;people.forEach(p=>{for(let w=1;w<=4;w++)if(w!==editingWeek)weeklyMetrics.forEach(m=>p.weekly[activeMonthKey][w][m.key].target=p.weekly[activeMonthKey][editingWeek][m.key].target);for(let w=1;w<=4;w++)syncWeeklyInsurance(p,w)});renderAll()}
+
+function historyStore(){try{return JSON.parse(localStorage.getItem('salesWidgetHistoryV1')||'{}')}catch(e){return {}}}
+function snapshotForMonth(){
+ const snap={month:activeMonthKey,savedAt:new Date().toISOString(),metrics:{},people:people.map(p=>({id:p.id,name:p.name,data:JSON.parse(JSON.stringify(p.data))}))};
+ metrics.forEach(m=>{const t=storeTarget(m.key),a=storeActual(m.key);snap.metrics[m.key]={target:t,actual:a,rate:rate(t,a)}});return snap;
+}
+function archiveCurrentMonth(show=false){const h=historyStore();h[activeMonthKey]=snapshotForMonth();localStorage.setItem('salesWidgetHistoryV1',JSON.stringify(h));if(show)alert(activeMonthKey+' 已封存');renderManagerReports()}
+function reportCoreKeys(){return ['totalInsurance','totalLines','ganp','above999']}
+function trackingRows(){
+ const w=currentWeek(),rows=[];
+ people.forEach(p=>{
+   let lagItems=0,totalGap=0,worstForecast=999,labels=[];
+   metrics.forEach(m=>{
+     const wd=p.weekly[activeMonthKey]?.[w]?.[m.key]||{target:0,actual:0},wt=+wd.target||0,wa=+wd.actual||0;
+     const md=p.data[m.key]||{target:0,actual:0},mt=+md.target||0,ma=+md.actual||0;
+     if(wt>0&&wa<wt){lagItems++;totalGap+=wt-wa;labels.push(m.label+'差'+format(wt-wa))}
+     if(mt>0){const fr=rate(mt,ma/(+elapsedDays.value||1)*(+totalDays.value||1));if(fr!==null)worstForecast=Math.min(worstForecast,fr)}
+   });
+   if(lagItems){let score=lagItems*20+totalGap*8+Math.max(100-worstForecast,0);let level=score>=70?'high':score>=35?'medium':'low';rows.push({person:p.name,lagItems,totalGap,worstForecast,score,level,labels})}
+ });
+ return rows.sort((a,b)=>b.score-a.score||b.totalGap-a.totalGap)
+}
+function buildWeeklyReport(){
+ const d=new Date(),r=weekRanges(d)[currentWeek(d)-1],m=d.getMonth()+1,track=trackingRows(),meet=meetingRows(),lines=[];
+ lines.push(`【${activeMonthKey} 第${currentWeek()}週 店長週報】`);
+ lines.push(`期間：${m}/${r.start}～${m}/${r.end}`);lines.push('');
+ lines.push('一、全店 KPI');
+ reportCoreKeys().forEach(k=>{const meta=metrics.find(x=>x.key===k),t=storeTarget(k),a=storeActual(k),fr=a/(+elapsedDays.value||1)*(+totalDays.value||1);lines.push(`${meta.label}：實際 ${format(a)}/${format(t)}（${rateText(rate(t,a))}），月底預估 ${format(fr)}（${rateText(rate(t,fr))}）`)});
+ lines.push('');lines.push('二、本週進度');
+ lines.push(meet.length?`落後 ${new Set(meet.map(x=>x.person)).size} 人、${meet.length} 個項目。`:'本週目前無落後人員。');
+ meet.slice(0,10).forEach(x=>lines.push(`- ${x.person}｜${x.label}：${format(x.weekActual)}/${format(x.weekTarget)}，還差 ${format(x.gap)}，月底預估 ${rateText(x.forecastRate)}`));
+ lines.push('');lines.push('三、建議追蹤');
+ if(!track.length)lines.push('目前無需優先追蹤的人員。');
+ track.slice(0,8).forEach((x,i)=>lines.push(`${i+1}. ${x.person}：落後 ${x.lagItems} 項，${x.labels.slice(0,3).join('、')}；最低月底預估 ${x.worstForecast===999?'—':x.worstForecast.toFixed(1)+'%'}`));
+ lines.push('');lines.push('四、下週行動');
+ lines.push('- 優先追蹤月底預估低於 100% 且本週落後的人員。');
+ lines.push('- 依「自動生成剩餘週目標」重新分配剩餘缺口。');
+ lines.push('- 每日匯入後確認落後名單與今日最低需求。');
+ return lines.join('\n')
+}
+function renderManagerReports(){
+ const h=historyStore(),keys=Object.keys(h).sort().reverse(),track=trackingRows(),d=new Date(),r=weekRanges(d)[currentWeek(d)-1];
+ historyCount.textContent=keys.length;reportLagPeople.textContent=new Set(meetingRows().map(x=>x.person)).size;priorityCount.textContent=track.filter(x=>x.level==='high').length;reportWeekLabel.textContent=`${d.getMonth()+1}/${r.start}～${d.getMonth()+1}/${r.end}`;
+ trackingList.innerHTML='';if(!track.length)trackingList.innerHTML='<div class="report-row priority-low"><div><strong>目前無優先追蹤名單</strong><small>本週進度正常</small></div></div>';
+ track.slice(0,12).forEach((x,i)=>{const div=document.createElement('div');div.className='report-row priority-'+x.level;div.innerHTML=`<div><strong>${i+1}. ${esc(x.person)}</strong><small>${x.labels.slice(0,3).join('、')}</small></div><div style="text-align:right"><strong>${x.lagItems} 項落後</strong><small>月底最低預估 ${x.worstForecast===999?'—':x.worstForecast.toFixed(1)+'%'}</small></div>`;trackingList.appendChild(div)});
+ weeklyReportText.value=buildWeeklyReport();historyBody.innerHTML='';
+ keys.forEach(k=>{const snap=h[k],vals=reportCoreKeys().map(key=>snap.metrics?.[key]||{target:0,actual:0,rate:null}),valid=Object.values(snap.metrics||{}).filter(x=>x.rate!==null),avg=valid.length?valid.reduce((a,b)=>a+b.rate,0)/valid.length:null,tr=document.createElement('tr');tr.innerHTML=`<td><strong>${k}</strong></td>${vals.map(v=>`<td>${format(v.actual)} / ${format(v.target)}<br><span class="rate ${rateClass(v.rate)}">${rateText(v.rate)}</span></td>`).join('')}<td>${rateText(avg)}</td>`;historyBody.appendChild(tr)});
+}
+function downloadText(name,text,type='text/plain'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+text],{type:type+';charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function downloadWeeklyReport(){downloadText(activeMonthKey+'_第'+currentWeek()+'週店長週報.txt',buildWeeklyReport())}
+function dailyKPIText(){const lines=[`【${activeMonthKey} 每日 KPI】`,`更新：${new Date().toLocaleString('zh-TW')}`];reportCoreKeys().forEach(k=>{const m=metrics.find(x=>x.key===k),t=storeTarget(k),a=storeActual(k),fr=a/(+elapsedDays.value||1)*(+totalDays.value||1);lines.push(`${m.label} ${format(a)}/${format(t)}｜達成 ${rateText(rate(t,a))}｜月底預估 ${rateText(rate(t,fr))}`)});const tr=trackingRows();lines.push(`追蹤重點：${tr.length?tr.slice(0,3).map(x=>x.person+'（'+x.lagItems+'項）').join('、'):'目前無落後人員'}`);return lines.join('\n')}
+async function shareLineKPI(){const text=dailyKPIText();if(navigator.share){try{await navigator.share({title:'每日 KPI',text});return}catch(e){}}downloadText(activeMonthKey+'_每日KPI_LINE文字.txt',text);alert('此瀏覽器無法直接叫出分享選單，已下載 LINE 分享文字檔。')}
+function pptEscape(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function downloadWeeklyPPT(){
+ const track=trackingRows(),meet=meetingRows(),slides=[];
+ slides.push(`<section><h1>${activeMonthKey} 第${currentWeek()}週 店長週會</h1><h2>門市 KPI 營運回顧</h2><p>${new Date().toLocaleDateString('zh-TW')}</p></section>`);
+ slides.push(`<section><h1>全店 KPI</h1>${reportCoreKeys().map(k=>{const m=metrics.find(x=>x.key===k),t=storeTarget(k),a=storeActual(k),fr=a/(+elapsedDays.value||1)*(+totalDays.value||1);return `<div class="kpi"><b>${pptEscape(m.label)}</b><span>實際 ${format(a)} / ${format(t)}｜月底預估 ${rateText(rate(t,fr))}</span></div>`}).join('')}</section>`);
+ slides.push(`<section><h1>本週落後名單</h1>${meet.length?meet.slice(0,10).map(x=>`<div class="item"><b>${pptEscape(x.person)}｜${pptEscape(x.label)}</b><span>${format(x.weekActual)}/${format(x.weekTarget)}，差 ${format(x.gap)}，月底預估 ${rateText(x.forecastRate)}</span></div>`).join(''):'<p>本週無落後人員</p>'}</section>`);
+ slides.push(`<section><h1>建議追蹤</h1>${track.length?track.slice(0,8).map((x,i)=>`<div class="item"><b>${i+1}. ${pptEscape(x.person)}</b><span>${pptEscape(x.labels.slice(0,3).join('、'))}</span></div>`).join(''):'<p>目前無需優先追蹤</p>'}</section>`);
+ const html=`<html><head><meta charset="utf-8"><style>@page{size:13.333in 7.5in;margin:0}body{margin:0;font-family:Microsoft JhengHei;background:white;color:#302a39}section{page-break-after:always;width:12.4in;height:6.6in;padding:.45in;box-sizing:border-box}h1{font-size:30pt;color:#7251b5;margin:0 0 20pt}h2{font-size:22pt}.kpi,.item{display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:14pt 4pt;font-size:18pt}.kpi b,.item b{color:#302a39}.kpi span,.item span{font-size:15pt}
+.import-panel{margin:0 26px 16px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#faf7ff;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.import-status{font-size:13px;line-height:1.6;color:var(--muted)}.import-status strong{color:var(--text)}.import-ok{color:var(--good)!important}.import-error{color:var(--bad)!important}@media(max-width:900px){.import-panel{margin:0 16px 12px;padding:12px}.import-panel button{width:100%}}
+</style></head><body>${slides.join('')}</body></html>`;
+ downloadText(activeMonthKey+'_第'+currentWeek()+'週會簡報.ppt',html,'application/vnd.ms-powerpoint')
+}
+function showPage(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.tabs button').forEach(x=>x.className='secondary');document.getElementById(id).classList.add('active');const tabId=id==='dashboardPage'?'dashboardTab':id==='weeklyPage'?'weeklyTab':id==='lagPage'?'lagTab':id==='meetingPage'?'meetingTab':'reportsTab';document.getElementById(tabId).className='active';renderAll()}
+function saveData(show){localStorage.setItem('salesWidgetV3',JSON.stringify({people,storeTargets,greenThreshold:+greenThreshold.value||100}));const h=historyStore();h[activeMonthKey]=snapshotForMonth();localStorage.setItem('salesWidgetHistoryV1',JSON.stringify(h));if(show)alert('資料已儲存並更新歷史月份')}
+
+function excelDate(value){
+  if(value instanceof Date&&!isNaN(value))return value;
+  if(typeof value==='number')return new Date(Math.round((value-25569)*86400*1000));
+  if(typeof value==='string'){
+    const s=value.trim();
+    const m=s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+    if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+    const d=new Date(s);if(!isNaN(d))return d;
+  }
+  return null;
+}
+function employeeCode(value){const m=String(value??'').trim().match(/^(\d+)/);return m?m[1]:''}
+function cleanText(v){return String(v??'').trim()}
+function numberValue(v){const n=Number(String(v??'').replace(/,/g,''));return Number.isFinite(n)?n:0}
+function categoryKey(value){
+ const s=cleanText(value).replace(/[／/、\s]/g,'');
+ if(s==='手機保險')return'phoneInsurance';
+ if(s==='電腦保險')return'pcInsurance';
+ if(s==='平板保險')return'tabletInsurance';
+ if(s==='手錶耳機保險'||s==='耳機手錶保險')return'watchAudioInsurance';
+ if(s==='總保險')return'totalInsurance';
+ return'';
+}
+function personForImport(code,display){
+ let p=people.find(x=>String(x.employeeId||employeeCode(x.name))===String(code));
+ if(!p){p=defaultPerson(display||code||'未命名人員');p.employeeId=String(code||'');people.push(p)}
+ else{p.employeeId=String(code||p.employeeId||'');if(display)p.name=display}
+ migratePerson(p);return p;
+}
+function resetImportedActuals(){
+ const keys=['phoneInsurance','pcInsurance','tabletInsurance','watchAudioInsurance','totalInsurance','totalLines','ganp','above999'];
+ people.forEach(p=>{keys.forEach(k=>{if(p.data[k])p.data[k].actual=0});p.extraTotalInsuranceMonthly=0;ensureWeekly(p);for(let w=1;w<=4;w++){keys.forEach(k=>{if(p.weekly[activeMonthKey][w][k])p.weekly[activeMonthKey][w][k].actual=0});p.weekly[activeMonthKey][w]._extraTotalInsurance=0}})
+}
+function addImportedValue(p,key,qty,date){
+ if(!p.data[key])return;
+ if(key==='totalInsurance')p.extraTotalInsuranceMonthly=(+p.extraTotalInsuranceMonthly||0)+qty;
+ else p.data[key].actual=(+p.data[key].actual||0)+qty;
+ const w=currentWeek(date);ensureWeekly(p);
+ if(key==='totalInsurance')p.weekly[activeMonthKey][w]._extraTotalInsurance=(+p.weekly[activeMonthKey][w]._extraTotalInsurance||0)+qty;
+ else if(p.weekly[activeMonthKey][w][key])p.weekly[activeMonthKey][w][key].actual=(+p.weekly[activeMonthKey][w][key].actual||0)+qty;
+}
+function sheetRows(wb,name){const ws=wb.Sheets[name];return ws?XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true}):null}
+async function importTrackingWorkbook(file){
+ const status=document.getElementById('importStatus');
+ if(!file)return;
+ if(typeof XLSX==='undefined'){status.className='import-status import-error';status.textContent='Excel 解析元件載入失敗，請確認網路連線後重新整理。';return}
+ status.className='import-status';status.textContent='正在讀取 '+file.name+'…';
+ try{
+  const wb=XLSX.read(await file.arrayBuffer(),{type:'array',cellDates:true});
+  const required=['Data','對應表','門號表','人員表'];
+  const missing=required.filter(n=>!wb.Sheets[n]);
+  if(missing.length)throw new Error('缺少工作表：'+missing.join('、'));
+  const staffRows=sheetRows(wb,'人員表');
+  const staffMap=new Map();
+  for(let i=1;i<staffRows.length;i++){
+   const code=employeeCode(staffRows[i][0]);if(!code)continue;
+   const display=cleanText(staffRows[i][2])||`${code}-${cleanText(staffRows[i][1])}`;
+   staffMap.set(code,display);personForImport(code,display);
+  }
+  resetImportedActuals();
+  const mapRows=sheetRows(wb,'對應表'),skuMap=new Map();
+  for(let i=1;i<mapRows.length;i++){const sku=cleanText(mapRows[i][0]),key=categoryKey(mapRows[i][2]);if(sku&&key)skuMap.set(sku,key)}
+  const dataRows=sheetRows(wb,'Data');let dataCount=0,insuranceCount=0,ignoredCount=0;
+  for(let i=1;i<dataRows.length;i++){
+   const row=dataRows[i],d=excelDate(row[0]);
+   if(!d||monthKey(d)!==activeMonthKey)continue;
+   dataCount++;
+   const key=skuMap.get(cleanText(row[3]));
+   if(!key){ignoredCount++;continue}
+   const code=employeeCode(row[6]);if(!code)continue;
+   const p=personForImport(code,staffMap.get(code)||cleanText(row[6]));
+   const qty=numberValue(row[7])||1;addImportedValue(p,key,qty,d);insuranceCount+=qty;
+  }
+  // 門號表以原始 A～D 欄逐筆計算本月，可避免 Excel 公式尚未重算。
+  const lineRows=sheetRows(wb,'門號表');let lineCount=0,gaCount=0,aboveCount=0;
+  for(let i=1;i<lineRows.length;i++){
+   const row=lineRows[i],d=excelDate(row[0]);
+   if(!d||monthKey(d)!==activeMonthKey)continue;
+   const code=employeeCode(row[3]||row[4]);if(!code)continue;
+   const p=personForImport(code,staffMap.get(code)||cleanText(row[4])||String(code));
+   addImportedValue(p,'totalLines',1,d);lineCount++;
+   const kind=cleanText(row[2]).toUpperCase();if(kind==='GA'||kind==='NP'){addImportedValue(p,'ganp',1,d);gaCount++}
+   const plan=numberValue(row[1]);if(plan>=999){addImportedValue(p,'above999',1,d);aboveCount++}
+  }
+  people.forEach(p=>{syncPersonInsurance(p);for(let w=1;w<=4;w++)syncWeeklyInsurance(p,w)});
+  saveData(false);renderAll();
+  const now=new Date();localStorage.setItem('salesWidgetLastImport',JSON.stringify({file:file.name,time:now.toISOString(),dataCount,insuranceCount,lineCount,gaCount,aboveCount}));
+  status.className='import-status import-ok';
+  status.innerHTML=`<strong>匯入完成：</strong>${file.name}<br>本月 Data ${dataCount} 筆｜保險計入 ${format(insuranceCount)} 件｜門號 ${format(lineCount)}｜GA/NP ${format(gaCount)}｜999以上 ${format(aboveCount)}｜略過非保險商品 ${ignoredCount} 筆<br>更新時間：${now.toLocaleString('zh-TW')}`;
+ }catch(err){console.error(err);status.className='import-status import-error';status.textContent='匯入失敗：'+(err?.message||err)}
+}
+function restoreImportStatus(){try{const x=JSON.parse(localStorage.getItem('salesWidgetLastImport')||'null');if(!x)return;const s=document.getElementById('importStatus');s.className='import-status import-ok';s.innerHTML=`<strong>上次匯入：</strong>${x.file}<br>保險 ${format(x.insuranceCount)}｜門號 ${format(x.lineCount)}｜GA/NP ${format(x.gaCount)}｜999以上 ${format(x.aboveCount)}｜${new Date(x.time).toLocaleString('zh-TW')}`;}catch(e){}}
+function loadData(){try{const s=JSON.parse(localStorage.getItem('salesWidgetV3')||'null');if(s){people=s.people||[];storeTargets=s.storeTargets||{};greenThreshold.value=s.greenThreshold||100}}catch(e){}if(!people.length)people=[defaultPerson('人員 1'),defaultPerson('人員 2')];people.forEach(migratePerson);metrics.forEach(m=>{if(storeTargets[m.key]===undefined)storeTargets[m.key]=0})}
+function resetAll(){if(!confirm('確定清除全部資料？'))return;localStorage.removeItem('salesWidgetV3');people=[defaultPerson('人員 1'),defaultPerson('人員 2')];storeTargets={};metrics.forEach(m=>storeTargets[m.key]=0);renderAll()}
+function exportCSV(){const rows=[['人員',...metrics.flatMap(m=>[m.label+'目標',m.label+'實績',m.label+'達成率'])]];const sr=['全店'];metrics.forEach(m=>sr.push(storeTarget(m.key),storeActual(m.key),rateText(rate(storeTarget(m.key),storeActual(m.key)))));rows.push(sr);people.forEach(p=>{const r=[p.name];metrics.forEach(m=>r.push(p.data[m.key].target,p.data[m.key].actual,rateText(rate(p.data[m.key].target,p.data[m.key].actual))));rows.push(r)});const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=activeMonthKey+'_業績試算.csv';a.click()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+initCalendar();loadData();renderAll();restoreImportStatus();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
